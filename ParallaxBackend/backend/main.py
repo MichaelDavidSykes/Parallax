@@ -6,7 +6,7 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.endpoints import accounts, backtests, integrations, markets, opportunities, pipeline, portfolios
+from backend.api.endpoints import accounts, automations, integrations, trading212
 from backend.core.config import settings
 from backend.db.database import Database
 
@@ -59,29 +59,14 @@ async def health():
 
 
 app.include_router(
-    markets.router,
-    prefix=f"{settings.API_V1_STR}/markets",
-    tags=["markets"],
-)
-app.include_router(
-    opportunities.router,
-    prefix=f"{settings.API_V1_STR}/opportunities",
-    tags=["opportunities"],
-)
-app.include_router(
-    portfolios.router,
-    prefix=f"{settings.API_V1_STR}/portfolios",
-    tags=["portfolios"],
-)
-app.include_router(
     accounts.router,
     prefix=f"{settings.API_V1_STR}/accounts",
     tags=["accounts"],
 )
 app.include_router(
-    backtests.router,
-    prefix=f"{settings.API_V1_STR}/backtests",
-    tags=["backtests"],
+    trading212.router,
+    prefix=f"{settings.API_V1_STR}/trading212",
+    tags=["trading212"],
 )
 app.include_router(
     integrations.router,
@@ -89,7 +74,7 @@ app.include_router(
     tags=["integrations"],
 )
 app.include_router(
-    pipeline.router,
-    prefix=f"{settings.API_V1_STR}/pipeline",
-    tags=["pipeline"],
+    automations.router,
+    prefix=f"{settings.API_V1_STR}/automations",
+    tags=["automations"],
 )

@@ -1,9 +1,8 @@
 <section class="page">
   <div class="page-header">
-    <div>
-      <h1 class="page-title">Trading Dashboard</h1>
-    </div>
+    <h1 class="page-title">Dashboard</h1>
     <div class="toolbar-row">
+      <span class="pill">{{ summary?.status || health?.status || 'offline' }}</span>
       <button mat-stroked-button color="primary" (click)="refresh()" [disabled]="loading">
         <mat-icon>refresh</mat-icon>
         Refresh
@@ -17,143 +16,98 @@
   <div class="metric-grid">
     <article class="metric-card">
       <div class="metric-label">Net Worth</div>
-      <div class="metric-value">${{ (netWorth?.total_value || 0) | number:'1.0-0' }}</div>
-      <div class="metric-note">{{ platforms.length }} platform{{ platforms.length === 1 ? '' : 's' }}</div>
+      <div class="metric-value">{{ currencySymbol }}{{ (summary?.total_value || 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">Trading 212</div>
     </article>
     <article class="metric-card">
       <div class="metric-label">Cash</div>
-      <div class="metric-value">${{ (netWorth?.cash || paperCash) | number:'1.0-0' }}</div>
-      <div class="metric-note">{{ health?.status || 'offline' }}</div>
+      <div class="metric-value">{{ currencySymbol }}{{ (summary?.cash || 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ currency }}</div>
     </article>
     <article class="metric-card">
       <div class="metric-label">Positions</div>
-      <div class="metric-value">${{ (netWorth?.positions_value || 0) | number:'1.0-0' }}</div>
-      <div class="metric-note">{{ stockPerformance.length }} stock{{ stockPerformance.length === 1 ? '' : 's' }}</div>
+      <div class="metric-value">{{ currencySymbol }}{{ (summary?.positions_value || 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ positions.length }} open</div>
     </article>
     <article class="metric-card">
-      <div class="metric-label">Edges</div>
-      <div class="metric-value">{{ opportunities.length }}</div>
-      <div class="metric-note">{{ bestOpportunity ? pct(bestOpportunity.edge) + ' top edge' : 'scan pending' }}</div>
+      <div class="metric-label">P&L</div>
+      <div
+        class="metric-value"
+        [class.positive]="(summary?.total_pnl || 0) >= 0"
+        [class.negative]="(summary?.total_pnl || 0) < 0">
+        {{ signedMoney(summary?.total_pnl) }}
+      </div>
+      <div class="metric-note">{{ signedPct(summary?.total_pnl_pct) }}</div>
     </article>
   </div>
 
-  <div class="dashboard-grid">
-    <section class="panel">
-      <div class="panel-header">
-        <h2 class="panel-title">Platforms</h2>
-      </div>
-      <table class="data-table" *ngIf="platforms.length; else noPlatforms">
-        <thead>
-          <tr>
-            <th>Platform</th>
-            <th>Status</th>
-            <th>Cash</th>
-            <th>Positions</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let platform of platforms">
-            <td><span class="market-title">{{ platform.platform }}</span></td>
-            <td><span class="pill">{{ platform.status }}</span></td>
-            <td>${{ platform.cash | number:'1.0-0' }}</td>
-            <td>${{ platform.positions_value | number:'1.0-0' }}</td>
-            <td>${{ platform.total_value | number:'1.0-0' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <ng-template #noPlatforms>
-        <div class="empty-state">No account data.</div>
-      </ng-template>
-    </section>
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Positions</h2>
+    </div>
+    <table class="data-table" *ngIf="positions.length; else noPositions">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Qty</th>
+          <th>Avg</th>
+          <th>Last</th>
+          <th>Value</th>
+          <th>P&L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let position of positions">
+          <td>
+            <span class="market-title">{{ position.symbol }}</span>
+            <span class="table-subtext">{{ position.name }}</span>
+          </td>
+          <td>{{ position.quantity | number:'1.0-4' }}</td>
+          <td>{{ currencySymbol }}{{ (position.avg_price || 0) | number:'1.2-2' }}</td>
+          <td>{{ currencySymbol }}{{ (position.current_price || 0) | number:'1.2-2' }}</td>
+          <td>{{ currencySymbol }}{{ position.value | number:'1.2-2' }}</td>
+          <td [class.positive]="position.pnl >= 0" [class.negative]="position.pnl < 0">
+            {{ signedMoney(position.pnl) }}
+            <span class="table-subtext">{{ signedPct(position.pnl_pct) }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noPositions>
+      <div class="empty-state">No Trading 212 positions.</div>
+    </ng-template>
+  </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <h2 class="panel-title">Stocks</h2>
-      </div>
-      <table class="data-table" *ngIf="stockPerformance.length; else noStocks">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Qty</th>
-            <th>Value</th>
-            <th>Return</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let holding of stockPerformance">
-            <td><span class="market-title">{{ holding.symbol || holding.name }}</span></td>
-            <td>{{ holding.quantity | number:'1.0-4' }}</td>
-            <td>${{ holding.value | number:'1.2-2' }}</td>
-            <td [class.positive]="(holding.total_return_pct || 0) >= 0" [class.negative]="(holding.total_return_pct || 0) < 0">
-              {{ holding.total_return_pct === null || holding.total_return_pct === undefined ? '-' : signedPct(holding.total_return_pct) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <ng-template #noStocks>
-        <div class="empty-state">No configured stock positions.</div>
-      </ng-template>
-    </section>
-  </div>
-
-  <div class="dashboard-grid dashboard-grid--wide">
-    <section class="panel">
-      <div class="panel-header">
-        <h2 class="panel-title">Top Opportunities</h2>
-        <a class="pill" routerLink="/opportunities">Open scanner</a>
-      </div>
-      <table class="data-table" *ngIf="opportunities.length; else noEdges">
-        <thead>
-          <tr>
-            <th>Market</th>
-            <th>Side</th>
-            <th>Edge</th>
-            <th>Confidence</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let opportunity of opportunities | slice:0:6">
-            <td><span class="market-title">{{ opportunity.question || opportunity.market_id }}</span></td>
-            <td><span class="pill pill--buy">{{ opportunity.side }}</span></td>
-            <td>{{ pct(opportunity.edge) }}</td>
-            <td>{{ pct(opportunity.confidence) }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <ng-template #noEdges>
-        <div class="empty-state">No scanned opportunities yet.</div>
-      </ng-template>
-    </section>
-
-    <section class="panel">
-      <div class="panel-header">
-        <h2 class="panel-title">Backtest Pulse</h2>
-        <a class="pill" routerLink="/backtests">Run lab</a>
-      </div>
-      <div class="panel-body" *ngIf="lastBacktest; else noBacktests">
-        <div class="run-pulse">
-          <div>
-            <span class="metric-label">Latest run</span>
-            <strong>{{ lastBacktest.name }}</strong>
-          </div>
-          <div>
-            <span class="metric-label">Return</span>
-            <strong [class.positive]="lastBacktest.return_pct >= 0" [class.negative]="lastBacktest.return_pct < 0">
-              {{ lastBacktest.return_pct | number:'1.2-2' }}%
-            </strong>
-          </div>
-        </div>
-        <div class="equity-strip">
-          <span
-            *ngFor="let point of lastBacktest.equity_curve | slice:-18"
-            [style.height.%]="point.equity / lastBacktest.initial_cash * 72">
-          </span>
-        </div>
-      </div>
-      <ng-template #noBacktests>
-        <div class="empty-state">No backtests have run yet.</div>
-      </ng-template>
-    </section>
-  </div>
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Historical Trades</h2>
+    </div>
+    <table class="data-table" *ngIf="trades.length; else noTrades">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Symbol</th>
+          <th>Side</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Value</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let trade of trades | slice:0:25">
+          <td>{{ trade.executed_at | date:'medium' }}</td>
+          <td><span class="market-title">{{ trade.symbol }}</span></td>
+          <td><span class="pill" [class.pill--buy]="trade.side === 'BUY'" [class.pill--danger]="trade.side === 'SELL'">{{ trade.side }}</span></td>
+          <td>{{ trade.quantity | number:'1.0-4' }}</td>
+          <td>{{ currencySymbol }}{{ trade.price | number:'1.2-2' }}</td>
+          <td>{{ currencySymbol }}{{ trade.value | number:'1.2-2' }}</td>
+          <td>{{ trade.status || trade.type }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noTrades>
+      <div class="empty-state">No historical trades.</div>
+    </ng-template>
+  </section>
 </section>

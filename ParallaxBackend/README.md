@@ -1,18 +1,13 @@
 # Parallax Backend
 
-FastAPI service for the Parallax quantitative trading platform.
+FastAPI service for the simplified Parallax trading platform.
 
-It follows the LunarSurfaceBackend shape:
+Current product surface:
 
-- `backend/main.py` wires the API, CORS, request metadata, and startup database setup.
-- `backend/api/endpoints` owns route modules.
-- `backend/services` owns trading, scanning, portfolios, and backtesting workflows.
-- `backend/integrations` owns Polymarket, LunarChain, and Draft API adapters.
-- Binance Spot market data is read-only and public by default.
-- Trading 212 account data is read-only until `TRADING212_API_KEY` and `TRADING212_API_SECRET` are configured.
-- Account summary aggregation is exposed through `/api/v1/accounts/summary`.
-- Backtest models are registered from `PARALLAX_MODEL_REGISTRY_PATH` and can be containerized under `ParallaxModels`.
-- `backend/strategies` is where custom model-backed strategies can be added.
+- Trading 212 account summary through `/api/v1/trading212/summary`.
+- Trading 212 trade-derived chart data through `/api/v1/trading212/chart`.
+- Trading 212 market order proxy through `/api/v1/trading212/orders/market`.
+- Empty automation registry through `/api/v1/automations`.
 
 ## Local
 
@@ -21,26 +16,14 @@ cd ParallaxBackend
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8010
 ```
 
-The default database is `./data/parallax.db`.
+## Trading 212
 
-## Docker
-
-```bash
-docker compose -f docker-compose.local.yml up --build
-```
-
-Production mirrors LunarChain's Doppler + Cloudflare origin cert pattern:
+Set these in the backend environment:
 
 ```bash
-docker compose up --build -d
+TRADING212_ENV=demo
+TRADING212_API_KEY=...
+TRADING212_API_SECRET=...
 ```
 
-## Key API Calls
-
-```bash
-curl http://localhost:8010/api/v1/health
-curl -X POST 'http://localhost:8010/api/v1/markets/sync?limit=25'
-curl -X POST http://localhost:8010/api/v1/opportunities/scan \
-  -H 'content-type: application/json' \
-  -d '{"market_limit":25,"min_edge":0.04,"refresh_markets":true}'
-```
+Use `TRADING212_ENV=live` only when you want real Trading 212 live-account access.

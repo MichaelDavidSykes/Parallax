@@ -165,9 +165,12 @@ class BinanceTickerOut(BaseModel):
 
 
 class Trading212AccountOut(BaseModel):
+    summary: Dict[str, Any] = {}
     info: Dict[str, Any] = {}
     cash: Dict[str, Any] = {}
     positions: List[Dict[str, Any]] = []
+    pending_orders: List[Dict[str, Any]] = []
+    historical_orders: List[Dict[str, Any]] = []
     source: str = "trading212"
 
 
@@ -226,3 +229,82 @@ class BacktestModelOut(BaseModel):
     strategy: str = "stat_arb_v1"
     status: str = "available"
     parameters: List[ModelParameterOut] = []
+
+
+class Trading212PositionOut(BaseModel):
+    symbol: str
+    name: str = ""
+    currency: str = "USD"
+    quantity: float = 0
+    avg_price: Optional[float] = None
+    current_price: Optional[float] = None
+    value: float = 0
+    pnl: float = 0
+    pnl_pct: Optional[float] = None
+
+
+class Trading212TradeOut(BaseModel):
+    id: str = ""
+    symbol: str
+    name: str = ""
+    side: str = "BUY"
+    quantity: float = 0
+    price: float = 0
+    value: float = 0
+    status: str = ""
+    type: str = "MARKET"
+    executed_at: str = ""
+
+
+class Trading212SummaryOut(BaseModel):
+    configured: bool
+    status: str
+    platform: str = "Trading 212"
+    currency: str = "USD"
+    cash: float = 0
+    positions_value: float = 0
+    total_value: float = 0
+    total_pnl: float = 0
+    total_pnl_pct: Optional[float] = None
+    positions: List[Trading212PositionOut] = []
+    trades: List[Trading212TradeOut] = []
+    updated_at: str
+
+
+class ChartCandleOut(BaseModel):
+    time: int
+    open: float
+    high: float
+    low: float
+    close: float
+
+
+class ChartPointOut(BaseModel):
+    time: int
+    value: float
+
+
+class TradingChartOut(BaseModel):
+    configured: bool
+    status: str
+    ticker: str = ""
+    timeframe: str = "1M"
+    candles: List[ChartCandleOut] = []
+    line: List[ChartPointOut] = []
+    trades: List[Trading212TradeOut] = []
+
+
+class MarketOrderCreate(BaseModel):
+    ticker: str
+    side: str = Field(default="BUY", pattern="^(BUY|SELL|buy|sell)$")
+    quantity: float = Field(default=1, gt=0)
+    extended_hours: bool = False
+
+
+class AutomationOut(BaseModel):
+    id: str
+    name: str
+    status: str = "paused"
+    trigger: str = ""
+    action: str = ""
+    updated_at: str

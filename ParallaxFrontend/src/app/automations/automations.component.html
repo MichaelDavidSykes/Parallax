@@ -1,0 +1,41 @@
+<section class="page">
+  <div class="page-header">
+    <h1 class="page-title">Automations</h1>
+    <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Rules</h2>
+    </div>
+    <table class="data-table" *ngIf="automations.length; else noAutomations">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Trigger</th>
+          <th>Action</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let automation of automations">
+          <td><span class="market-title">{{ automation.name }}</span></td>
+          <td><span class="pill">{{ automation.status }}</span></td>
+          <td>{{ automation.trigger }}</td>
+          <td>{{ automation.action }}</td>
+          <td>{{ automation.updated_at | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noAutomations>
+      <div class="empty-state">No automations.</div>
+    </ng-template>
+  </section>
+</section>

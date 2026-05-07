@@ -8,7 +8,7 @@ Parallax follows LunarSurfaceBackend's production model:
 - Doppler injects production secrets.
 - Cloudflare origin certs are mounted from `/etc/ssl/cloudflare`.
 - Port `443` on the host forwards to Uvicorn on `8000`.
-- `ParallaxModels` is synced beside the backend and mounted read-only at `/app/models`.
+- Trading 212 credentials are injected by the backend environment.
 
 Set these before deploying:
 
@@ -23,6 +23,7 @@ Required remote prerequisites:
 - Docker and Docker Compose.
 - Doppler token available as `DOPPLER_TOKEN`.
 - Cloudflare origin certs at `/etc/ssl/cloudflare/origin.pem` and `/etc/ssl/cloudflare/origin.key`.
+- `TRADING212_API_KEY`, `TRADING212_API_SECRET`, and `TRADING212_ENV` available through Doppler or the remote `.env`.
 
 ## Frontend on Firebase
 

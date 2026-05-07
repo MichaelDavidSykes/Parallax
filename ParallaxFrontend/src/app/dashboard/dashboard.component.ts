@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
 
-import { BacktestRun, HealthResponse, Holding, Market, NetWorthSummary, Opportunity, PlatformValue, Portfolio } from '../models/api.models';
+import { HealthResponse, Trading212Summary, Trading212Trade } from '../models/api.models';
 import { ParallaxApiService } from '../services/parallax-api.service';
 
 @Component({
@@ -13,11 +13,7 @@ export class DashboardComponent implements OnInit {
   public loading = false;
   public error = '';
   public health: HealthResponse | null = null;
-  public markets: Market[] = [];
-  public opportunities: Opportunity[] = [];
-  public backtests: BacktestRun[] = [];
-  public portfolios: Portfolio[] = [];
-  public netWorth: NetWorthSummary | null = null;
+  public summary: Trading212Summary | null = null;
 
   constructor(private api: ParallaxApiService) {}
 
@@ -30,54 +26,47 @@ export class DashboardComponent implements OnInit {
     this.error = '';
     forkJoin({
       health: this.api.health(),
-      markets: this.api.listMarkets(40),
-      opportunities: this.api.listOpportunities(20),
-      backtests: this.api.listBacktests(10),
-      portfolios: this.api.listPortfolios(),
-      netWorth: this.api.accountSummary()
+      summary: this.api.trading212Summary()
     }).subscribe({
       next: result => {
         this.health = result.health;
-        this.markets = result.markets;
-        this.opportunities = result.opportunities;
-        this.backtests = result.backtests;
-        this.portfolios = result.portfolios;
-        this.netWorth = result.netWorth;
+        this.summary = result.summary;
         this.loading = false;
       },
       error: err => {
-        this.error = err?.error?.detail || err?.message || 'Parallax API is not reachable.';
+        this.error = err?.error?.detail || err?.message || 'Trading 212 is not reachable.';
         this.loading = false;
       }
     });
   }
 
-  public get bestOpportunity(): Opportunity | null {
-    return this.opportunities[0] || null;
+  public get positions() {
+    return this.summary?.positions || [];
   }
 
-  public get paperCash(): number {
-    return this.portfolios.reduce((total, portfolio) => total + portfolio.cash_balance, 0);
+  public get trades(): Trading212Trade[] {
+    return this.summary?.trades || [];
   }
 
-  public get platforms(): PlatformValue[] {
-    return this.netWorth?.platforms || [];
+  public get currency(): string {
+    return this.summary?.currency || 'USD';
   }
 
-  public get stockPerformance(): Holding[] {
-    return this.netWorth?.stock_performance || [];
+  public signedPct(value: number | undefined | null): string {
+    if (value === null || value === undefined) {
+      return '-';
+    }
+    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
   }
 
-  public get lastBacktest(): BacktestRun | null {
-    return this.backtests[0] || null;
+  public signedMoney(value: number | undefined | null): string {
+    const amount = value || 0;
+    return `${amount >= 0 ? '+' : '-'}${this.currencySymbol}${Math.abs(amount).toLocaleString(undefined, {
+      maximumFractionDigits: 2
+    })}`;
   }
 
-  public pct(value: number | undefined): string {
-    return `${(((value || 0) * 100)).toFixed(1)}%`;
-  }
-
-  public signedPct(value: number | undefined): string {
-    const pct = value || 0;
-    return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+  public get currencySymbol(): string {
+    return this.currency === 'GBP' ? '£' : this.currency === 'EUR' ? '€' : '$';
   }
 }

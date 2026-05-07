@@ -1,106 +1,7 @@
-export interface Market {
-  id: string;
-  question: string;
-  slug?: string;
-  category?: string;
-  active: boolean;
-  closed: boolean;
-  end_date?: string;
-  liquidity: number;
-  volume: number;
-  image?: string;
-  outcomes: string[];
-  outcome_prices: number[];
-  clob_token_ids: string[];
-  updated_at: string;
-}
-
-export interface Opportunity {
-  id?: number;
-  market_id: string;
-  question?: string;
-  slug?: string;
-  category?: string;
-  detected_at: string;
-  side: string;
-  market_price: number;
-  fair_probability: number;
-  edge: number;
-  expected_value: number;
-  confidence: number;
-  max_stake: number;
-  rationale: string;
-}
-
-export interface Portfolio {
-  id: string;
-  name: string;
-  initial_cash: number;
-  cash_balance: number;
-  created_at: string;
-  positions: Position[];
-}
-
-export interface Position {
-  id?: number;
-  portfolio_id: string;
-  market_id: string;
-  outcome: string;
-  quantity: number;
-  avg_price: number;
-  realized_pnl: number;
-}
-
-export interface Trade {
-  id?: number;
-  portfolio_id: string;
-  market_id: string;
-  side: string;
-  outcome: string;
-  quantity: number;
-  price: number;
-  notional: number;
-  fees: number;
-  simulated_at?: string;
-  strategy: string;
-}
-
-export interface BacktestRun {
-  id: string;
-  name: string;
-  strategy: string;
-  model_id?: string;
-  initial_cash: number;
-  final_equity: number;
-  return_pct: number;
-  started_at: string;
-  completed_at: string;
-  parameters: Record<string, unknown>;
-  metrics: Record<string, number>;
-  equity_curve: Array<{ timestamp: string; cash: number; equity: number }>;
-  trades: Array<Record<string, unknown>>;
-}
-
-export interface BacktestModelParameter {
-  key: string;
-  label: string;
-  kind: string;
-  default: number | string | boolean;
-  min?: number;
-  max?: number;
-  step?: number;
-  options: string[];
-}
-
-export interface BacktestModel {
-  id: string;
-  name: string;
-  description: string;
-  runtime: string;
-  image: string;
-  strategy: string;
+export interface HealthResponse {
   status: string;
-  parameters: BacktestModelParameter[];
+  service: string;
+  db_path: string;
 }
 
 export interface IntegrationStatus {
@@ -108,25 +9,6 @@ export interface IntegrationStatus {
   configured: boolean;
   status: string;
   endpoint?: string;
-}
-
-export interface BinanceTicker {
-  symbol: string;
-  price: number;
-  source: string;
-}
-
-export interface Trading212Account {
-  info: Record<string, unknown>;
-  cash: Record<string, number>;
-  positions: Array<Record<string, unknown>>;
-  source: string;
-}
-
-export interface HealthResponse {
-  status: string;
-  service: string;
-  db_path: string;
 }
 
 export interface PlatformValue {
@@ -161,5 +43,77 @@ export interface NetWorthSummary {
   platforms: PlatformValue[];
   holdings: Holding[];
   stock_performance: Holding[];
+  updated_at: string;
+}
+
+export interface Trading212Position {
+  symbol: string;
+  name: string;
+  currency: string;
+  quantity: number;
+  avg_price?: number;
+  current_price?: number;
+  value: number;
+  pnl: number;
+  pnl_pct?: number;
+}
+
+export interface Trading212Trade {
+  id: string;
+  symbol: string;
+  name: string;
+  side: 'BUY' | 'SELL' | string;
+  quantity: number;
+  price: number;
+  value: number;
+  status: string;
+  type: string;
+  executed_at: string;
+}
+
+export interface Trading212Summary {
+  configured: boolean;
+  status: string;
+  platform: string;
+  currency: string;
+  cash: number;
+  positions_value: number;
+  total_value: number;
+  total_pnl: number;
+  total_pnl_pct?: number;
+  positions: Trading212Position[];
+  trades: Trading212Trade[];
+  updated_at: string;
+}
+
+export interface ChartCandle {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+export interface ChartPoint {
+  time: number;
+  value: number;
+}
+
+export interface TradingChart {
+  configured: boolean;
+  status: string;
+  ticker: string;
+  timeframe: string;
+  candles: ChartCandle[];
+  line: ChartPoint[];
+  trades: Trading212Trade[];
+}
+
+export interface Automation {
+  id: string;
+  name: string;
+  status: string;
+  trigger: string;
+  action: string;
   updated_at: string;
 }

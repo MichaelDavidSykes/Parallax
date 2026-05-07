@@ -1,0 +1,111 @@
+<section class="page trading-page">
+  <div class="page-header">
+    <h1 class="page-title">Trading</h1>
+    <div class="toolbar-row">
+      <mat-form-field appearance="outline" class="ticker-field">
+        <mat-label>Ticker</mat-label>
+        <mat-select [ngModel]="selectedTicker" (ngModelChange)="onTickerChange($event)">
+          <mat-option *ngFor="let ticker of tickers" [value]="ticker">{{ ticker }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-button-toggle-group [value]="chartMode" (valueChange)="setChartMode($event)">
+        <mat-button-toggle value="candles">Candles</mat-button-toggle>
+        <mat-button-toggle value="line">Line</mat-button-toggle>
+      </mat-button-toggle-group>
+      <button mat-stroked-button color="primary" (click)="loadSummary()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+  <div *ngIf="orderStatus" class="pill pill--buy">{{ orderStatus }}</div>
+
+  <div class="trading-layout">
+    <section class="panel chart-panel">
+      <div class="chart-toolbar">
+        <div class="symbol-stack">
+          <span>{{ selectedTicker || 'Trading 212' }}</span>
+          <strong>{{ chartData?.status || summary?.status || 'offline' }}</strong>
+        </div>
+        <mat-button-toggle-group [value]="timeframe" (valueChange)="setTimeframe($event)">
+          <mat-button-toggle *ngFor="let item of timeframes" [value]="item">{{ item }}</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <div #chartHost class="chart-host" [class.chart-host--empty]="!(chartData?.candles?.length)">
+        <div *ngIf="!(chartData?.candles?.length)" class="empty-state">No chart data.</div>
+      </div>
+    </section>
+
+    <section class="panel ticket-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Order</h2>
+      </div>
+      <div class="panel-body ticket-body">
+        <mat-form-field appearance="outline">
+          <mat-label>Ticker</mat-label>
+          <input matInput [(ngModel)]="order.ticker">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Side</mat-label>
+          <mat-select [(ngModel)]="order.side">
+            <mat-option value="BUY">Buy</mat-option>
+            <mat-option value="SELL">Sell</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Quantity</mat-label>
+          <input matInput type="number" min="0" step="0.0001" [(ngModel)]="order.quantity">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Extended hours</mat-label>
+          <mat-select [(ngModel)]="order.extended_hours">
+            <mat-option [value]="false">Off</mat-option>
+            <mat-option [value]="true">On</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          class="order-button"
+          (click)="placeOrder()"
+          [disabled]="placingOrder || !order.ticker || order.quantity <= 0">
+          {{ order.side === 'SELL' ? 'Sell' : 'Buy' }}
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Buys & Sells</h2>
+    </div>
+    <table class="data-table" *ngIf="trades.length; else noTrades">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Side</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Value</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let trade of trades | slice:-30">
+          <td>{{ trade.executed_at | date:'medium' }}</td>
+          <td><span class="pill" [class.pill--buy]="trade.side === 'BUY'" [class.pill--danger]="trade.side === 'SELL'">{{ trade.side }}</span></td>
+          <td>{{ trade.quantity | number:'1.0-4' }}</td>
+          <td>{{ currencySymbol }}{{ trade.price | number:'1.2-2' }}</td>
+          <td>{{ currencySymbol }}{{ trade.value | number:'1.2-2' }}</td>
+          <td>{{ trade.status || trade.type }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noTrades>
+      <div class="empty-state">No trades for this ticker.</div>
+    </ng-template>
+  </section>
+</section>
