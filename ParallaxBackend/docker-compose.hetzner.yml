@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parallaxbackend-container
+    command: [
+      "uvicorn", "backend.main:app",
+      "--host", "0.0.0.0", "--port", "8000"
+    ]
+    expose:
+      - "8000"
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - PYTHONPATH=/app
+      - PARALLAX_DB_PATH=/app/data/parallax.db
+      - PARALLAX_CORS_ORIGINS=https://parallax-lunarchain.web.app,https://parallax.lunarchain.net,http://localhost:4200,http://localhost:4201,http://localhost:4202
+      - PARALLAX_ENABLE_HEURISTIC_STATS=true
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: parallax-caddy
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - parallax_caddy_data:/data
+      - parallax_caddy_config:/config
+
+volumes:
+  parallax_caddy_data:
+  parallax_caddy_config:
+

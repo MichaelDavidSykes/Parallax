@@ -49,6 +49,8 @@ python -m parallax_engine_prefect backtest --initial-cash 10000
 
 External statistical signals are intentionally modular:
 
+- Production frontend: `https://parallax-lunarchain.web.app`
+- Production API fallback hostname: `https://parallax-api.46.62.157.149.nip.io`
 - `DRAFT_API_URL` should expose a `/probabilities` endpoint returning `fair_probability`, `confidence`, and optional `rationale`.
 - `LUNARCHAIN_API_URL` should expose `/api/v1/signals/polymarket`.
 - If neither is configured, Parallax uses a low-confidence local statistical prior so the app stays usable.

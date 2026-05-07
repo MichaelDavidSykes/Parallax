@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   environment: 'development',
-  apiUrl: 'https://api.parallax.lunarchain.net',
+  apiUrl: 'https://parallax-api.46.62.157.149.nip.io',
   apiVersion: 'v1',
   enableDebugLogging: true,
   enableAnalytics: false,
@@ -11,4 +11,3 @@ export const environment = {
     enableExternalStats: true
   }
 };
-

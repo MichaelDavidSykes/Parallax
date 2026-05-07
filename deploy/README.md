@@ -34,3 +34,12 @@ npm run deploy:prod
 
 The current hosting site placeholder is `parallax-lunarchain`.
 
+## Temporary Production API Hostname
+
+Until `api.parallax.lunarchain.net` exists in DNS, the deployed frontend uses:
+
+```text
+https://parallax-api.46.62.157.149.nip.io
+```
+
+This hostname resolves to the Hetzner server and is terminated by Caddy in `ParallaxBackend/docker-compose.hetzner.yml`.

@@ -1,0 +1,5 @@
+parallax-api.46.62.157.149.nip.io {
+  encode gzip
+  reverse_proxy backend:8000
+}
+
