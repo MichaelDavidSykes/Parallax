@@ -1,0 +1,22 @@
+###
+### Example deployment. Adjust work_pool_name and image before registering.
+###
+name: parallax-backtest-pipeline
+version: 1
+tags:
+  - parallax
+  - backtesting
+entrypoint: parallax_engine_prefect/flows.py:parallax_backtest_pipeline
+parameters:
+  name: Scheduled stat arb replay
+  initial_cash: 10000
+  market_limit: 120
+  min_edge: 0.04
+  max_position_pct: 0.08
+  fee_bps: 0
+work_pool:
+  name: default-agent-pool
+schedule:
+  cron: "0 * * * *"
+  timezone: "Europe/London"
+

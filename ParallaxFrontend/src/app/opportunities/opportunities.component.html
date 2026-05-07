@@ -1,0 +1,81 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Arbitrage Scanner</h1>
+      <p class="page-subtitle">Compares Polymarket prices against configured stats providers, with a transparent local fallback while external feeds are being wired.</p>
+    </div>
+    <div class="toolbar-row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Markets</mat-label>
+        <input matInput type="number" [(ngModel)]="marketLimit" min="1" max="500">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Min edge</mat-label>
+        <input matInput type="number" [(ngModel)]="minEdge" min="0" max="1" step="0.01">
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="scan()" [disabled]="loading">
+        <mat-icon>radar</mat-icon>
+        Scan
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+
+  <div class="metric-grid">
+    <article class="metric-card">
+      <div class="metric-label">Detected</div>
+      <div class="metric-value">{{ opportunities.length }}</div>
+      <div class="metric-note">above threshold</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Top Edge</div>
+      <div class="metric-value">{{ opportunities[0] ? (abs(opportunities[0].edge) | percent:'1.1-1') : '0.0%' }}</div>
+      <div class="metric-note">{{ opportunities[0] ? opportunities[0].side : 'none' }}</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Stake Cap</div>
+      <div class="metric-value">${{ (opportunities[0] ? opportunities[0].max_stake : 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">top recommendation</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Min Edge</div>
+      <div class="metric-value">{{ minEdge | percent:'1.0-1' }}</div>
+      <div class="metric-note">current scanner threshold</div>
+    </article>
+  </div>
+
+  <section class="panel">
+    <table class="data-table" *ngIf="opportunities.length; else noOpportunities">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Signal</th>
+          <th>Market</th>
+          <th>Fair</th>
+          <th>Edge</th>
+          <th>EV</th>
+          <th>Stake</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let opportunity of opportunities">
+          <td>
+            <span class="market-title">{{ opportunity.question || opportunity.market_id }}</span>
+            <span class="rationale">{{ opportunity.rationale }}</span>
+          </td>
+          <td><span class="pill pill--buy">{{ opportunity.side }}</span></td>
+          <td>{{ opportunity.market_price | percent:'1.1-1' }}</td>
+          <td>{{ opportunity.fair_probability | percent:'1.1-1' }}</td>
+          <td [class.positive]="opportunity.edge > 0" [class.negative]="opportunity.edge < 0">{{ opportunity.edge | percent:'1.1-1' }}</td>
+          <td>{{ opportunity.expected_value | percent:'1.1-1' }}</td>
+          <td>${{ opportunity.max_stake | number:'1.0-0' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noOpportunities>
+      <div class="empty-state">No opportunities above the current threshold.</div>
+    </ng-template>
+  </section>
+</section>

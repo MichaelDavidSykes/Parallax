@@ -1,0 +1,47 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Integrations</h1>
+      <p class="page-subtitle">Runtime visibility for Polymarket, LunarChain API hooks, Draft database hooks, and local stats fallback.</p>
+    </div>
+    <div class="toolbar-row">
+      <button mat-stroked-button (click)="refresh()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+
+  <section class="panel">
+    <table class="data-table" *ngIf="statuses.length; else noIntegrations">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Status</th>
+          <th>Configured</th>
+          <th>Endpoint</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let status of statuses">
+          <td>
+            <span class="integration-name">
+              <span class="status-dot" [ngClass]="statusClass(status)"></span>
+              {{ status.name }}
+            </span>
+          </td>
+          <td><span class="pill">{{ status.status }}</span></td>
+          <td>{{ status.configured ? 'Yes' : 'No' }}</td>
+          <td>{{ status.endpoint || 'not set' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noIntegrations>
+      <div class="empty-state">No integration status available.</div>
+    </ng-template>
+  </section>
+</section>
+

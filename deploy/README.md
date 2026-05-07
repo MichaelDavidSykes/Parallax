@@ -1,0 +1,36 @@
+# Deployment
+
+## Backend on Hetzner
+
+Parallax follows LunarSurfaceBackend's production model:
+
+- Dockerized FastAPI service.
+- Doppler injects production secrets.
+- Cloudflare origin certs are mounted from `/etc/ssl/cloudflare`.
+- Port `443` on the host forwards to Uvicorn on `8000`.
+
+Set these before deploying:
+
+```bash
+export REMOTE=root@your-hetzner-host
+export APP_DIR=/opt/parallax
+./hetzner-deploy.sh
+```
+
+Required remote prerequisites:
+
+- Docker and Docker Compose.
+- Doppler token available as `DOPPLER_TOKEN`.
+- Cloudflare origin certs at `/etc/ssl/cloudflare/origin.pem` and `/etc/ssl/cloudflare/origin.key`.
+
+## Frontend on Firebase
+
+`ParallaxFrontend/firebase.json` is set up like LunarSurface. Once the Firebase project/site exists:
+
+```bash
+cd ../ParallaxFrontend
+npm run deploy:prod
+```
+
+The current hosting site placeholder is `parallax-lunarchain`.
+

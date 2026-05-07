@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parallaxbackend-container
+    entrypoint: ["doppler", "run", "--"]
+    command: [
+      "uvicorn", "backend.main:app",
+      "--host", "0.0.0.0", "--port", "8000",
+      "--ssl-certfile", "/etc/ssl/cloudflare/origin.pem",
+      "--ssl-keyfile", "/etc/ssl/cloudflare/origin.key"
+    ]
+    ports:
+      - "443:8000"
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - PYTHONPATH=/app
+      - DOPPLER_PROJECT=parallax
+      - DOPPLER_TOKEN=${DOPPLER_TOKEN}
+      - PARALLAX_DB_PATH=/app/data/parallax.db
+

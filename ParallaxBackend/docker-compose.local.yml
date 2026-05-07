@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parallaxbackend-container
+    command: [
+      "uvicorn", "backend.main:app",
+      "--host", "0.0.0.0", "--port", "8010",
+      "--reload"
+    ]
+    ports:
+      - "8010:8010"
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - PYTHONPATH=/app
+      - PARALLAX_DB_PATH=/app/data/parallax.db
+      - PARALLAX_ENABLE_HEURISTIC_STATS=true

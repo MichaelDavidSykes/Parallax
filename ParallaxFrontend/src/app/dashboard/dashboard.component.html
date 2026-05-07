@@ -1,0 +1,101 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Trading Dashboard</h1>
+      <p class="page-subtitle">Polymarket pricing, statistical edges, simulated capital, and backtest health in one control room.</p>
+    </div>
+    <div class="toolbar-row">
+      <button mat-stroked-button color="primary" (click)="refresh()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+
+  <div class="metric-grid">
+    <article class="metric-card">
+      <div class="metric-label">API</div>
+      <div class="metric-value">{{ health?.status || 'offline' }}</div>
+      <div class="metric-note">{{ health?.service || 'Parallax' }}</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Markets</div>
+      <div class="metric-value">{{ markets.length }}</div>
+      <div class="metric-note">active local cache</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Edges</div>
+      <div class="metric-value">{{ opportunities.length }}</div>
+      <div class="metric-note">{{ bestOpportunity ? pct(bestOpportunity.edge) + ' top edge' : 'scan pending' }}</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Paper Cash</div>
+      <div class="metric-value">${{ paperCash | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ portfolios.length }} portfolio{{ portfolios.length === 1 ? '' : 's' }}</div>
+    </article>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Top Opportunities</h2>
+        <a class="pill" routerLink="/opportunities">Open scanner</a>
+      </div>
+      <table class="data-table" *ngIf="opportunities.length; else noEdges">
+        <thead>
+          <tr>
+            <th>Market</th>
+            <th>Side</th>
+            <th>Edge</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let opportunity of opportunities | slice:0:6">
+            <td><span class="market-title">{{ opportunity.question || opportunity.market_id }}</span></td>
+            <td><span class="pill pill--buy">{{ opportunity.side }}</span></td>
+            <td>{{ pct(opportunity.edge) }}</td>
+            <td>{{ pct(opportunity.confidence) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noEdges>
+        <div class="empty-state">No scanned opportunities yet.</div>
+      </ng-template>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Backtest Pulse</h2>
+        <a class="pill" routerLink="/backtests">Run lab</a>
+      </div>
+      <div class="panel-body" *ngIf="lastBacktest; else noBacktests">
+        <div class="run-pulse">
+          <div>
+            <span class="metric-label">Latest run</span>
+            <strong>{{ lastBacktest.name }}</strong>
+          </div>
+          <div>
+            <span class="metric-label">Return</span>
+            <strong [class.positive]="lastBacktest.return_pct >= 0" [class.negative]="lastBacktest.return_pct < 0">
+              {{ lastBacktest.return_pct | number:'1.2-2' }}%
+            </strong>
+          </div>
+        </div>
+        <div class="equity-strip">
+          <span
+            *ngFor="let point of lastBacktest.equity_curve | slice:-18"
+            [style.height.%]="point.equity / lastBacktest.initial_cash * 72">
+          </span>
+        </div>
+      </div>
+      <ng-template #noBacktests>
+        <div class="empty-state">No backtests have run yet.</div>
+      </ng-template>
+    </section>
+  </div>
+</section>
+

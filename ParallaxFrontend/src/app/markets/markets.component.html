@@ -1,0 +1,55 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Polymarket Markets</h1>
+      <p class="page-subtitle">Live market discovery through Gamma, cached locally for scanner and replay workflows.</p>
+    </div>
+    <div class="toolbar-row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Limit</mat-label>
+        <input matInput type="number" [(ngModel)]="limit" min="1" max="500">
+      </mat-form-field>
+      <button mat-stroked-button (click)="load()" [disabled]="loading">
+        <mat-icon>database</mat-icon>
+        Cache
+      </button>
+      <button mat-flat-button color="primary" (click)="sync()" [disabled]="loading">
+        <mat-icon>sync</mat-icon>
+        Sync
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div *ngIf="error" class="pill pill--danger">{{ error }}</div>
+
+  <section class="panel">
+    <table class="data-table" *ngIf="markets.length; else noMarkets">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Yes</th>
+          <th>Liquidity</th>
+          <th>Volume</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let market of markets">
+          <td>
+            <span class="market-title">{{ market.question }}</span>
+            <span class="pill">{{ market.category || 'general' }}</span>
+          </td>
+          <td>{{ yesPrice(market) | percent:'1.1-1' }}</td>
+          <td>${{ market.liquidity | number:'1.0-0' }}</td>
+          <td>${{ market.volume | number:'1.0-0' }}</td>
+          <td>{{ market.end_date | date:'mediumDate' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noMarkets>
+      <div class="empty-state">No markets cached yet.</div>
+    </ng-template>
+  </section>
+</section>
+

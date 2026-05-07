@@ -1,0 +1,19 @@
+###
+### Example deployment. Adjust work_pool_name and image before registering.
+###
+name: parallax-ingestion-pipeline
+version: 1
+tags:
+  - parallax
+  - polymarket
+  - arbitrage
+entrypoint: parallax_engine_prefect/flows.py:parallax_ingestion_pipeline
+parameters:
+  market_limit: 120
+  min_edge: 0.04
+work_pool:
+  name: default-agent-pool
+schedule:
+  cron: "*/15 * * * *"
+  timezone: "Europe/London"
+
