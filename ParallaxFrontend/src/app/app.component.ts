@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 
 interface NavItem {
   label: string;
   route: string;
-  icon: string;
 }
 
 interface NavSection {
@@ -21,7 +20,8 @@ interface NavSection {
 })
 export class AppComponent {
   public title = 'Parallax';
-  public navHidden = false;
+  public navHidden = this.isCompactViewport();
+  public isCompactNavigation = this.isCompactViewport();
   public navSearch = '';
   public expandedNavSectionId: string | null = 'trading';
   public readonly navSections: NavSection[] = [
@@ -30,9 +30,9 @@ export class AppComponent {
       label: 'Trading',
       icon: 'fa-chart-line',
       items: [
-        { label: 'Dashboard', route: '/dashboard', icon: 'fa-gauge-high' },
-        { label: 'Markets', route: '/markets', icon: 'fa-layer-group' },
-        { label: 'Opportunities', route: '/opportunities', icon: 'fa-scale-balanced' }
+        { label: 'Dashboard', route: '/dashboard' },
+        { label: 'Markets', route: '/markets' },
+        { label: 'Opportunities', route: '/opportunities' }
       ]
     },
     {
@@ -40,25 +40,36 @@ export class AppComponent {
       label: 'Research',
       icon: 'fa-flask',
       items: [
-        { label: 'Backtests', route: '/backtests', icon: 'fa-clock-rotate-left' },
-        { label: 'Simulator', route: '/simulator', icon: 'fa-wallet' }
-      ]
-    },
-    {
-      id: 'ops',
-      label: 'Ops',
-      icon: 'fa-plug',
-      items: [
-        { label: 'Integrations', route: '/integrations', icon: 'fa-diagram-project' }
+        { label: 'Backtests', route: '/backtests' },
+        { label: 'Simulator', route: '/simulator' }
       ]
     }
   ];
 
   constructor(private router: Router) {}
 
+  @HostListener('window:resize')
+  public onWindowResize(): void {
+    const isCompactNavigation = this.isCompactViewport();
+    if (isCompactNavigation === this.isCompactNavigation) {
+      return;
+    }
+
+    this.isCompactNavigation = isCompactNavigation;
+    if (isCompactNavigation) {
+      this.navHidden = true;
+    }
+  }
+
   public toggleSidebar(): void {
     this.navHidden = !this.navHidden;
     window.requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+  }
+
+  public closeSidebarOnSmallScreen(): void {
+    if (this.isCompactViewport()) {
+      this.navHidden = true;
+    }
   }
 
   public get filteredNavSections(): NavSection[] {
@@ -93,5 +104,8 @@ export class AppComponent {
   public toggleNavSection(sectionId: string): void {
     this.expandedNavSectionId = this.expandedNavSectionId === sectionId ? null : sectionId;
   }
-}
 
+  private isCompactViewport(): boolean {
+    return typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches;
+  }
+}

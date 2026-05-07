@@ -6,32 +6,63 @@
       [class.active]="!navHidden"
       (click)="toggleSidebar()"
       [attr.aria-label]="navHidden ? 'Show sidebar navigation' : 'Hide sidebar navigation'">
-      <i class="fas" [ngClass]="navHidden ? 'fa-angles-right' : 'fa-angles-left'"></i>
+      <i class="fas" [ngClass]="navHidden ? 'fa-angles-right' : 'fa-angles-left'" aria-hidden="true"></i>
     </button>
 
     <a class="platform-brand" routerLink="/dashboard" aria-label="Open Parallax dashboard">
       <img src="assets/logo/lunarchain-icon.png" class="platform-toolbar-logo" alt="LunarChain icon" />
       <div class="platform-brand-copy">
-        <span class="platform-brand-eyebrow">Quant Platform</span>
+        <span class="platform-brand-eyebrow">LunarChain</span>
         <span class="platform-brand-title">Parallax</span>
       </div>
     </a>
+
+    <div class="strategy-context" *ngIf="!isCompactNavigation" aria-label="Trading mode">
+      <span class="strategy-context__icon"><i class="fas fa-chart-simple" aria-hidden="true"></i></span>
+      <span class="strategy-context__label">Mode</span>
+      <span class="strategy-context__divider" aria-hidden="true"></span>
+      <span class="strategy-context__value">Paper Trading</span>
+    </div>
   </div>
 
-  <nav class="platform-actions" aria-label="Platform actions">
-    <a class="platform-nav-link" routerLink="/markets" routerLinkActive="platform-nav-link--active">Markets</a>
-    <a class="platform-nav-link platform-nav-link--outlined" routerLink="/backtests">Run Lab</a>
+  <nav class="platform-actions" *ngIf="!isCompactNavigation" aria-label="Platform actions">
+    <a class="platform-nav-link" routerLink="/opportunities" routerLinkActive="platform-nav-link--active">
+      <i class="fas fa-bullseye" aria-hidden="true"></i>
+      <span>Scanner</span>
+    </a>
+    <a class="platform-nav-link" routerLink="/markets" routerLinkActive="platform-nav-link--active">
+      <i class="fas fa-layer-group" aria-hidden="true"></i>
+      <span>Markets</span>
+    </a>
+    <a class="platform-nav-link platform-nav-link--outlined" routerLink="/backtests" routerLinkActive="platform-nav-link--active">
+      <i class="fas fa-flask" aria-hidden="true"></i>
+      <span>Backtest</span>
+    </a>
   </nav>
 </header>
 
 <mat-sidenav-container class="app-container">
-  <mat-sidenav mode="side" opened class="sidenav" [class.sidenav--hidden]="navHidden">
+  <mat-sidenav
+    *ngIf="!navHidden"
+    mode="side"
+    opened
+    class="sidenav">
     <div class="sidebar-shell">
-      <label class="sidebar-search" aria-label="Filter navigation">
-        <span class="sidebar-search__icon"><i class="fas fa-search"></i></span>
-        <input type="text" [(ngModel)]="navSearch" placeholder="Quick search" />
-        <span class="sidebar-search__meta">/</span>
-      </label>
+      <div class="sidebar-top">
+        <label class="sidebar-search" aria-label="Filter navigation">
+          <span class="sidebar-search__icon"><i class="fas fa-search" aria-hidden="true"></i></span>
+          <input type="text" [(ngModel)]="navSearch" placeholder="Quick search..." />
+          <span class="sidebar-search__meta">/</span>
+        </label>
+
+        <div class="sidebar-status" aria-label="System status">
+          <span class="status-dot status-dot--ok" aria-hidden="true"></span>
+          <span>
+            <span class="sidebar-status__label">System</span>
+            <strong>Live backend</strong>
+          </span>
+        </div>
+      </div>
 
       <nav class="menu" aria-label="Platform navigation">
         <section
@@ -45,25 +76,33 @@
             [class.active]="isNavSectionActive(section)"
             [attr.aria-expanded]="isNavSectionExpanded(section)"
             (click)="toggleNavSection(section.id)">
-            <span class="icon"><i class="fas" [ngClass]="section.icon"></i></span>
+            <span class="icon"><i class="fas" [ngClass]="section.icon" aria-hidden="true"></i></span>
             <span class="menu-section-trigger__label">{{ section.label }}</span>
             <span class="menu-section-trigger__chevron">
-              <i class="fas" [ngClass]="isNavSectionExpanded(section) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+              <i class="fas" [ngClass]="isNavSectionExpanded(section) ? 'fa-chevron-down' : 'fa-chevron-right'" aria-hidden="true"></i>
             </span>
           </button>
 
-          <div class="menu-subitems" [attr.aria-hidden]="!isNavSectionExpanded(section)">
+          <div class="menu-subitems" *ngIf="isNavSectionExpanded(section)">
             <a
               *ngFor="let item of section.items"
               class="menu-item menu-item--child"
               [class.active]="isNavItemActive(item.route)"
-              [routerLink]="item.route">
-              <span class="menu-item__icon"><i class="fas" [ngClass]="item.icon"></i></span>
+              [routerLink]="item.route"
+              [attr.aria-current]="isNavItemActive(item.route) ? 'page' : null"
+              (click)="closeSidebarOnSmallScreen()">
               <span class="menu-item__label">{{ item.label }}</span>
             </a>
           </div>
         </section>
       </nav>
+
+      <div class="sidebar-footer">
+        <a class="sidebar-footer-link" routerLink="/integrations" (click)="closeSidebarOnSmallScreen()">
+          <i class="fas fa-plug" aria-hidden="true"></i>
+          <span>Integrations</span>
+        </a>
+      </div>
     </div>
   </mat-sidenav>
 
