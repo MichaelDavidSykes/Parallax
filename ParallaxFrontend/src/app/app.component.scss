@@ -43,7 +43,7 @@ $sidebar-width: 232px;
   height: 32px;
   border: 1px solid var(--control-border);
   border-radius: 8px;
-  background: var(--control-bg);
+  background: #0d0f13;
   color: var(--text-secondary);
   cursor: pointer;
 }
@@ -62,9 +62,10 @@ $sidebar-width: 232px;
 }
 
 .platform-toolbar-logo {
-  width: 32px;
-  height: 32px;
+  width: auto;
+  height: 30px;
   flex-shrink: 0;
+  filter: brightness(0) invert(1);
 }
 
 .platform-brand-copy {
@@ -74,7 +75,7 @@ $sidebar-width: 232px;
 }
 
 .platform-brand-eyebrow {
-  color: var(--text-tertiary);
+  color: rgba(183, 183, 183, 0.84);
   font-size: 0.56rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -83,8 +84,8 @@ $sidebar-width: 232px;
 
 .platform-brand-title {
   color: var(--text-primary);
-  font-size: 0.96rem;
-  font-weight: 760;
+  font-size: 0.92rem;
+  font-weight: 700;
   line-height: 1.1;
 }
 
@@ -116,7 +117,7 @@ $sidebar-width: 232px;
   padding: 0 12px;
   border: 1px solid var(--control-border);
   border-radius: 8px;
-  background: var(--control-bg);
+  background: #0d0f13;
 }
 
 .sidenav {
@@ -127,7 +128,7 @@ $sidebar-width: 232px;
   height: calc(100vh - #{$toolbar-height});
   padding: 12px;
   border-right: 1px solid var(--border-subtle);
-  background: #0a0d0b;
+  background: #141418;
   transition: transform 0.2s ease;
 }
 
@@ -165,7 +166,7 @@ $sidebar-width: 232px;
   padding: 0 10px;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  background: var(--control-bg);
+  background: #0d0f13;
   color: var(--text-tertiary);
 }
 
@@ -230,7 +231,7 @@ $sidebar-width: 232px;
 .menu-item__icon {
   width: 18px;
   text-align: center;
-  color: var(--accent);
+  color: rgba(145, 94, 255, 0.92);
 }
 
 .menu-section-trigger__label,
@@ -285,4 +286,3 @@ $sidebar-width: 232px;
     padding: 16px;
   }
 }
-

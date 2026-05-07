@@ -15,24 +15,25 @@ app-root {
 
 :root {
   --page-bg: #050505;
-  --panel: #111412;
-  --panel-elevated: #171b18;
+  --panel: #141414;
+  --panel-elevated: #1a1a1a;
   --panel-soft: rgba(255, 255, 255, 0.035);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.14);
-  --text-primary: #f4f7f5;
-  --text-secondary: rgba(220, 229, 224, 0.74);
-  --text-tertiary: rgba(220, 229, 224, 0.55);
-  --accent: #2be4a7;
-  --accent-soft: rgba(43, 228, 167, 0.12);
-  --accent-border: rgba(43, 228, 167, 0.28);
-  --warning: #f1b84b;
-  --warning-soft: rgba(241, 184, 75, 0.14);
-  --danger: #ff6b7a;
-  --danger-soft: rgba(255, 107, 122, 0.12);
-  --info: #72a7ff;
-  --control-bg: #0c0f0d;
-  --control-hover: #161b18;
+  --text-primary: #f5f5f5;
+  --text-secondary: rgba(183, 183, 183, 0.84);
+  --text-tertiary: rgba(183, 183, 183, 0.64);
+  --accent: #915eff;
+  --accent-strong: #d196e6;
+  --accent-soft: rgba(145, 94, 255, 0.14);
+  --accent-border: rgba(145, 94, 255, 0.28);
+  --warning: #9f90e2;
+  --warning-soft: rgba(159, 144, 226, 0.14);
+  --danger: #b96470;
+  --danger-soft: rgba(185, 100, 112, 0.12);
+  --info: #6192ff;
+  --control-bg: #0c0d10;
+  --control-hover: #13161d;
   --control-border: rgba(255, 255, 255, 0.12);
   --radius: 8px;
 }
@@ -199,19 +200,19 @@ a {
 .pill--buy {
   border-color: var(--accent-border);
   background: var(--accent-soft);
-  color: #b7ffe6;
+  color: #e7dcff;
 }
 
 .pill--warn {
-  border-color: rgba(241, 184, 75, 0.32);
+  border-color: rgba(159, 144, 226, 0.32);
   background: var(--warning-soft);
-  color: #ffe2a0;
+  color: #ddd6ff;
 }
 
 .pill--danger {
-  border-color: rgba(255, 107, 122, 0.32);
+  border-color: rgba(185, 100, 112, 0.32);
   background: var(--danger-soft);
-  color: #ffc6ce;
+  color: #e8ced3;
 }
 
 .status-dot {
@@ -222,7 +223,7 @@ a {
 }
 
 .status-dot--ok {
-  background: var(--accent);
+  background: var(--accent-strong);
 }
 
 .status-dot--warn {
@@ -299,4 +300,3 @@ a.mdc-button {
     overflow-x: auto;
   }
 }
-
