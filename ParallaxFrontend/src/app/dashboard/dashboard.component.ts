@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
 
-import { BacktestRun, HealthResponse, Market, Opportunity, Portfolio } from '../models/api.models';
+import { BacktestRun, HealthResponse, Holding, Market, NetWorthSummary, Opportunity, PlatformValue, Portfolio } from '../models/api.models';
 import { ParallaxApiService } from '../services/parallax-api.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class DashboardComponent implements OnInit {
   public opportunities: Opportunity[] = [];
   public backtests: BacktestRun[] = [];
   public portfolios: Portfolio[] = [];
+  public netWorth: NetWorthSummary | null = null;
 
   constructor(private api: ParallaxApiService) {}
 
@@ -32,7 +33,8 @@ export class DashboardComponent implements OnInit {
       markets: this.api.listMarkets(40),
       opportunities: this.api.listOpportunities(20),
       backtests: this.api.listBacktests(10),
-      portfolios: this.api.listPortfolios()
+      portfolios: this.api.listPortfolios(),
+      netWorth: this.api.accountSummary()
     }).subscribe({
       next: result => {
         this.health = result.health;
@@ -40,6 +42,7 @@ export class DashboardComponent implements OnInit {
         this.opportunities = result.opportunities;
         this.backtests = result.backtests;
         this.portfolios = result.portfolios;
+        this.netWorth = result.netWorth;
         this.loading = false;
       },
       error: err => {
@@ -57,6 +60,14 @@ export class DashboardComponent implements OnInit {
     return this.portfolios.reduce((total, portfolio) => total + portfolio.cash_balance, 0);
   }
 
+  public get platforms(): PlatformValue[] {
+    return this.netWorth?.platforms || [];
+  }
+
+  public get stockPerformance(): Holding[] {
+    return this.netWorth?.stock_performance || [];
+  }
+
   public get lastBacktest(): BacktestRun | null {
     return this.backtests[0] || null;
   }
@@ -64,5 +75,9 @@ export class DashboardComponent implements OnInit {
   public pct(value: number | undefined): string {
     return `${(((value || 0) * 100)).toFixed(1)}%`;
   }
-}
 
+  public signedPct(value: number | undefined): string {
+    const pct = value || 0;
+    return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+  }
+}

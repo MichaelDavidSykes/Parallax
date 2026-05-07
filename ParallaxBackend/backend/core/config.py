@@ -29,6 +29,8 @@ class Settings(BaseSettings):
 
     BINANCE_API_URL: str = os.getenv("BINANCE_API_URL", "https://api.binance.com")
     BINANCE_SYMBOLS: str = os.getenv("BINANCE_SYMBOLS", "BTCUSDT,ETHUSDT,SOLUSDT")
+    BINANCE_API_KEY: str = os.getenv("BINANCE_API_KEY", "")
+    BINANCE_API_SECRET: str = os.getenv("BINANCE_API_SECRET", "")
 
     TRADING212_ENV: str = os.getenv("TRADING212_ENV", "demo")
     TRADING212_API_URL: str = os.getenv("TRADING212_API_URL", "")
@@ -40,6 +42,10 @@ class Settings(BaseSettings):
     ).strip().lower() in {"1", "true", "yes", "on"}
     DEFAULT_MARKET_LIMIT: int = int(os.getenv("PARALLAX_DEFAULT_MARKET_LIMIT", "80"))
     MIN_EDGE: float = float(os.getenv("PARALLAX_MIN_EDGE", "0.04"))
+    MODEL_REGISTRY_PATH: str = os.getenv(
+        "PARALLAX_MODEL_REGISTRY_PATH",
+        "../ParallaxModels",
+    )
 
     BACKEND_CORS_ORIGINS: List[str] = _parse_origins(
         os.getenv(

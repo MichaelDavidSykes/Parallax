@@ -8,6 +8,7 @@ Parallax follows LunarSurfaceBackend's production model:
 - Doppler injects production secrets.
 - Cloudflare origin certs are mounted from `/etc/ssl/cloudflare`.
 - Port `443` on the host forwards to Uvicorn on `8000`.
+- `ParallaxModels` is synced beside the backend and mounted read-only at `/app/models`.
 
 Set these before deploying:
 

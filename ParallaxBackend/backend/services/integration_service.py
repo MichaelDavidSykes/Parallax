@@ -22,8 +22,13 @@ class IntegrationService:
             polymarket_status = "unreachable"
 
         binance_status = "unknown"
+        binance = BinanceClient(
+            settings.BINANCE_API_URL,
+            settings.BINANCE_API_KEY,
+            settings.BINANCE_API_SECRET,
+        )
         try:
-            health = await BinanceClient(settings.BINANCE_API_URL).health()
+            health = await binance.health()
             binance_status = "online" if health["ok"] else "degraded"
         except Exception:
             binance_status = "unreachable"
@@ -47,6 +52,12 @@ class IntegrationService:
                 name="Binance Spot",
                 configured=True,
                 status=binance_status,
+                endpoint=settings.BINANCE_API_URL,
+            ),
+            IntegrationStatus(
+                name="Binance Account",
+                configured=binance.configured,
+                status="configured" if binance.configured else "not configured",
                 endpoint=settings.BINANCE_API_URL,
             ),
             IntegrationStatus(

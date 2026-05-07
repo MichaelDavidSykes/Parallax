@@ -124,11 +124,14 @@ class TradeOut(BaseModel):
 class BacktestCreate(BaseModel):
     name: str = "Stat arb replay"
     strategy: str = "stat_arb_v1"
+    model_id: str = "stat_arb_v1"
     initial_cash: float = Field(default=10000, gt=0)
     market_limit: int = Field(default=100, ge=1, le=1000)
     min_edge: float = Field(default=0.04, ge=0, le=1)
     max_position_pct: float = Field(default=0.08, gt=0, le=1)
     fee_bps: float = Field(default=0, ge=0)
+    slippage_bps: float = Field(default=0, ge=0)
+    valuation_basis: str = Field(default="fair", pattern="^(fair|market|hybrid)$")
     refresh_markets: bool = True
 
 
@@ -136,6 +139,7 @@ class BacktestOut(BaseModel):
     id: str
     name: str
     strategy: str
+    model_id: Optional[str] = None
     initial_cash: float
     final_equity: float
     return_pct: float
@@ -165,3 +169,60 @@ class Trading212AccountOut(BaseModel):
     cash: Dict[str, Any] = {}
     positions: List[Dict[str, Any]] = []
     source: str = "trading212"
+
+
+class PlatformValueOut(BaseModel):
+    platform: str
+    configured: bool
+    status: str
+    currency: str = "USD"
+    cash: float = 0
+    positions_value: float = 0
+    total_value: float = 0
+
+
+class HoldingOut(BaseModel):
+    platform: str
+    symbol: str
+    name: str = ""
+    asset_type: str = "asset"
+    quantity: float = 0
+    avg_price: Optional[float] = None
+    current_price: Optional[float] = None
+    value: float = 0
+    day_change_pct: Optional[float] = None
+    total_return_pct: Optional[float] = None
+    total_return_value: Optional[float] = None
+
+
+class NetWorthSummaryOut(BaseModel):
+    currency: str = "USD"
+    total_value: float
+    cash: float = 0
+    positions_value: float = 0
+    platforms: List[PlatformValueOut] = []
+    holdings: List[HoldingOut] = []
+    stock_performance: List[HoldingOut] = []
+    updated_at: str
+
+
+class ModelParameterOut(BaseModel):
+    key: str
+    label: str
+    kind: str = "number"
+    default: Any
+    min: Optional[float] = None
+    max: Optional[float] = None
+    step: Optional[float] = None
+    options: List[str] = []
+
+
+class BacktestModelOut(BaseModel):
+    id: str
+    name: str
+    description: str = ""
+    runtime: str = "builtin"
+    image: str = ""
+    strategy: str = "stat_arb_v1"
+    status: str = "available"
+    parameters: List[ModelParameterOut] = []

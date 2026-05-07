@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { BacktestRun, BinanceTicker, HealthResponse, IntegrationStatus, Market, Opportunity, Portfolio, Trade, Trading212Account } from '../models/api.models';
+import { BacktestModel, BacktestRun, BinanceTicker, HealthResponse, IntegrationStatus, Market, NetWorthSummary, Opportunity, Portfolio, Trade, Trading212Account } from '../models/api.models';
 
 @Injectable({
   providedIn: 'root'
@@ -87,14 +87,25 @@ export class ParallaxApiService {
   runBacktest(payload: {
     name: string;
     strategy: string;
+    model_id: string;
     initial_cash: number;
     market_limit: number;
     min_edge: number;
     max_position_pct: number;
     fee_bps: number;
+    slippage_bps: number;
+    valuation_basis: string;
     refresh_markets: boolean;
   }): Observable<BacktestRun> {
     return this.http.post<BacktestRun>(`${this.baseUrl}/backtests`, payload);
+  }
+
+  listBacktestModels(): Observable<BacktestModel[]> {
+    return this.http.get<BacktestModel[]>(`${this.baseUrl}/backtests/models`);
+  }
+
+  accountSummary(): Observable<NetWorthSummary> {
+    return this.http.get<NetWorthSummary>(`${this.baseUrl}/accounts/summary`);
   }
 
   integrations(): Observable<IntegrationStatus[]> {

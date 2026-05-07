@@ -6,7 +6,7 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.endpoints import backtests, integrations, markets, opportunities, pipeline, portfolios
+from backend.api.endpoints import accounts, backtests, integrations, markets, opportunities, pipeline, portfolios
 from backend.core.config import settings
 from backend.db.database import Database
 
@@ -74,6 +74,11 @@ app.include_router(
     tags=["portfolios"],
 )
 app.include_router(
+    accounts.router,
+    prefix=f"{settings.API_V1_STR}/accounts",
+    tags=["accounts"],
+)
+app.include_router(
     backtests.router,
     prefix=f"{settings.API_V1_STR}/backtests",
     tags=["backtests"],
@@ -88,4 +93,3 @@ app.include_router(
     prefix=f"{settings.API_V1_STR}/pipeline",
     tags=["pipeline"],
 )
-

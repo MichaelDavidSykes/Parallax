@@ -69,6 +69,7 @@ export interface BacktestRun {
   id: string;
   name: string;
   strategy: string;
+  model_id?: string;
   initial_cash: number;
   final_equity: number;
   return_pct: number;
@@ -78,6 +79,28 @@ export interface BacktestRun {
   metrics: Record<string, number>;
   equity_curve: Array<{ timestamp: string; cash: number; equity: number }>;
   trades: Array<Record<string, unknown>>;
+}
+
+export interface BacktestModelParameter {
+  key: string;
+  label: string;
+  kind: string;
+  default: number | string | boolean;
+  min?: number;
+  max?: number;
+  step?: number;
+  options: string[];
+}
+
+export interface BacktestModel {
+  id: string;
+  name: string;
+  description: string;
+  runtime: string;
+  image: string;
+  strategy: string;
+  status: string;
+  parameters: BacktestModelParameter[];
 }
 
 export interface IntegrationStatus {
@@ -104,4 +127,39 @@ export interface HealthResponse {
   status: string;
   service: string;
   db_path: string;
+}
+
+export interface PlatformValue {
+  platform: string;
+  configured: boolean;
+  status: string;
+  currency: string;
+  cash: number;
+  positions_value: number;
+  total_value: number;
+}
+
+export interface Holding {
+  platform: string;
+  symbol: string;
+  name: string;
+  asset_type: string;
+  quantity: number;
+  avg_price?: number;
+  current_price?: number;
+  value: number;
+  day_change_pct?: number;
+  total_return_pct?: number;
+  total_return_value?: number;
+}
+
+export interface NetWorthSummary {
+  currency: string;
+  total_value: number;
+  cash: number;
+  positions_value: number;
+  platforms: PlatformValue[];
+  holdings: Holding[];
+  stock_performance: Holding[];
+  updated_at: string;
 }

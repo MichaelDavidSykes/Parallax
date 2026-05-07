@@ -18,6 +18,7 @@ services:
     volumes:
       - .:/app
       - ./data:/app/data
+      - ../ParallaxModels:/app/models:ro
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -31,7 +32,10 @@ services:
       - PARALLAX_DB_PATH=/app/data/parallax.db
       - BINANCE_API_URL=${BINANCE_API_URL:-https://api.binance.com}
       - BINANCE_SYMBOLS=${BINANCE_SYMBOLS:-BTCUSDT,ETHUSDT,SOLUSDT}
+      - BINANCE_API_KEY=${BINANCE_API_KEY:-}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET:-}
       - TRADING212_ENV=${TRADING212_ENV:-demo}
       - TRADING212_API_URL=${TRADING212_API_URL:-}
       - TRADING212_API_KEY=${TRADING212_API_KEY:-}
       - TRADING212_API_SECRET=${TRADING212_API_SECRET:-}
+      - PARALLAX_MODEL_REGISTRY_PATH=/app/models

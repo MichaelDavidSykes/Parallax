@@ -16,28 +16,88 @@
 
   <div class="metric-grid">
     <article class="metric-card">
-      <div class="metric-label">API</div>
-      <div class="metric-value">{{ health?.status || 'offline' }}</div>
-      <div class="metric-note">{{ health?.service || 'Parallax' }}</div>
+      <div class="metric-label">Net Worth</div>
+      <div class="metric-value">${{ (netWorth?.total_value || 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ platforms.length }} platform{{ platforms.length === 1 ? '' : 's' }}</div>
     </article>
     <article class="metric-card">
-      <div class="metric-label">Markets</div>
-      <div class="metric-value">{{ markets.length }}</div>
-      <div class="metric-note">active local cache</div>
+      <div class="metric-label">Cash</div>
+      <div class="metric-value">${{ (netWorth?.cash || paperCash) | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ health?.status || 'offline' }}</div>
+    </article>
+    <article class="metric-card">
+      <div class="metric-label">Positions</div>
+      <div class="metric-value">${{ (netWorth?.positions_value || 0) | number:'1.0-0' }}</div>
+      <div class="metric-note">{{ stockPerformance.length }} stock{{ stockPerformance.length === 1 ? '' : 's' }}</div>
     </article>
     <article class="metric-card">
       <div class="metric-label">Edges</div>
       <div class="metric-value">{{ opportunities.length }}</div>
       <div class="metric-note">{{ bestOpportunity ? pct(bestOpportunity.edge) + ' top edge' : 'scan pending' }}</div>
     </article>
-    <article class="metric-card">
-      <div class="metric-label">Paper Cash</div>
-      <div class="metric-value">${{ paperCash | number:'1.0-0' }}</div>
-      <div class="metric-note">{{ portfolios.length }} portfolio{{ portfolios.length === 1 ? '' : 's' }}</div>
-    </article>
   </div>
 
   <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Platforms</h2>
+      </div>
+      <table class="data-table" *ngIf="platforms.length; else noPlatforms">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Status</th>
+            <th>Cash</th>
+            <th>Positions</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let platform of platforms">
+            <td><span class="market-title">{{ platform.platform }}</span></td>
+            <td><span class="pill">{{ platform.status }}</span></td>
+            <td>${{ platform.cash | number:'1.0-0' }}</td>
+            <td>${{ platform.positions_value | number:'1.0-0' }}</td>
+            <td>${{ platform.total_value | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noPlatforms>
+        <div class="empty-state">No account data.</div>
+      </ng-template>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Stocks</h2>
+      </div>
+      <table class="data-table" *ngIf="stockPerformance.length; else noStocks">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Qty</th>
+            <th>Value</th>
+            <th>Return</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let holding of stockPerformance">
+            <td><span class="market-title">{{ holding.symbol || holding.name }}</span></td>
+            <td>{{ holding.quantity | number:'1.0-4' }}</td>
+            <td>${{ holding.value | number:'1.2-2' }}</td>
+            <td [class.positive]="(holding.total_return_pct || 0) >= 0" [class.negative]="(holding.total_return_pct || 0) < 0">
+              {{ holding.total_return_pct === null || holding.total_return_pct === undefined ? '-' : signedPct(holding.total_return_pct) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noStocks>
+        <div class="empty-state">No configured stock positions.</div>
+      </ng-template>
+    </section>
+  </div>
+
+  <div class="dashboard-grid dashboard-grid--wide">
     <section class="panel">
       <div class="panel-header">
         <h2 class="panel-title">Top Opportunities</h2>

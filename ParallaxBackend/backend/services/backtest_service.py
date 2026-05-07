@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Tuple
 from uuid import uuid4
 
 from backend.db.database import Database, utc_now
+from backend.services.model_registry_service import ModelRegistryService
 from backend.services.opportunity_service import OpportunityService
 from backend.strategies.stat_arb import StatArbStrategy
 
@@ -18,11 +19,14 @@ class BacktestService:
         self,
         name: str,
         strategy: str,
+        model_id: str,
         initial_cash: float,
         market_limit: int,
         min_edge: float,
         max_position_pct: float,
         fee_bps: float,
+        slippage_bps: float,
+        valuation_basis: str,
         refresh_markets: bool = True,
     ) -> Dict[str, Any]:
         started_at = utc_now()
@@ -36,8 +40,9 @@ class BacktestService:
         snapshots = self.db.list_snapshots(limit=max(500, market_limit * 30))
         snapshots = snapshots[-max(1, market_limit * 30):]
         grouped = self._group_by_time(snapshots)
+        model = ModelRegistryService().get(model_id or strategy)
         selected_strategy = self._strategy_for(
-            strategy=strategy,
+            strategy=str(model.get("strategy") or strategy),
             min_edge=min_edge,
             max_position_pct=max_position_pct,
             fee_bps=fee_bps,
@@ -54,7 +59,8 @@ class BacktestService:
                 latest_marks[str(snapshot["market_id"])] = snapshot
             signals = selected_strategy.generate(bucket, cash)
             for signal in signals:
-                notional = signal.quantity * signal.price
+                execution_price = self._execution_price(signal.price, signal.side, slippage_bps)
+                notional = signal.quantity * execution_price
                 fees = notional * (fee_bps / 10000)
                 if notional + fees > cash:
                     continue
@@ -78,7 +84,8 @@ class BacktestService:
                         "side": signal.side,
                         "outcome": signal.outcome,
                         "quantity": signal.quantity,
-                        "price": signal.price,
+                        "price": execution_price,
+                        "raw_signal_price": signal.price,
                         "notional": notional,
                         "fees": fees,
                         "edge": signal.edge,
@@ -90,11 +97,11 @@ class BacktestService:
                 {
                     "timestamp": captured_at,
                     "cash": cash,
-                    "equity": self._mark_equity(cash, positions, latest_marks),
+                    "equity": self._mark_equity(cash, positions, latest_marks, valuation_basis),
                 }
             )
 
-        final_equity = self._mark_equity(cash, positions, latest_marks)
+        final_equity = self._mark_equity(cash, positions, latest_marks, valuation_basis)
         completed_at = utc_now()
         avg_edge = (
             sum(abs(float(trade["edge"])) for trade in trades) / len(trades)
@@ -105,6 +112,7 @@ class BacktestService:
             "id": str(uuid4()),
             "name": name,
             "strategy": selected_strategy.name,
+            "model_id": model["id"],
             "initial_cash": initial_cash,
             "final_equity": final_equity,
             "return_pct": ((final_equity - initial_cash) / initial_cash) * 100,
@@ -115,7 +123,11 @@ class BacktestService:
                 "min_edge": min_edge,
                 "max_position_pct": max_position_pct,
                 "fee_bps": fee_bps,
+                "slippage_bps": slippage_bps,
+                "valuation_basis": valuation_basis,
                 "refresh_markets": refresh_markets,
+                "model_runtime": model.get("runtime"),
+                "model_image": model.get("image"),
             },
             "metrics": {
                 "snapshots": len(snapshots),
@@ -161,6 +173,7 @@ class BacktestService:
         cash: float,
         positions: Dict[Tuple[str, str], Dict[str, Any]],
         latest_marks: Dict[str, Dict[str, Any]],
+        valuation_basis: str = "fair",
     ) -> float:
         equity = cash
         for (market_id, outcome), position in positions.items():
@@ -168,7 +181,18 @@ class BacktestService:
             if not mark:
                 continue
             fair_yes = float(mark["fair_probability"])
-            fair_value = fair_yes if outcome == "YES" else 1 - fair_yes
+            market_yes = float(mark.get("yes_price") or fair_yes)
+            if valuation_basis == "market":
+                yes_value = market_yes
+            elif valuation_basis == "hybrid":
+                yes_value = (fair_yes + market_yes) / 2
+            else:
+                yes_value = fair_yes
+            fair_value = yes_value if outcome == "YES" else 1 - yes_value
             equity += float(position["quantity"]) * fair_value
         return equity
 
+    def _execution_price(self, price: float, side: str, slippage_bps: float) -> float:
+        slippage = max(0.0, slippage_bps) / 10000
+        adjusted = price * (1 + slippage)
+        return min(0.99, max(0.01, adjusted))

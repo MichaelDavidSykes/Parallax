@@ -10,6 +10,8 @@ It follows the LunarSurfaceBackend shape:
 - `backend/integrations` owns Polymarket, LunarChain, and Draft API adapters.
 - Binance Spot market data is read-only and public by default.
 - Trading 212 account data is read-only until `TRADING212_API_KEY` and `TRADING212_API_SECRET` are configured.
+- Account summary aggregation is exposed through `/api/v1/accounts/summary`.
+- Backtest models are registered from `PARALLAX_MODEL_REGISTRY_PATH` and can be containerized under `ParallaxModels`.
 - `backend/strategies` is where custom model-backed strategies can be added.
 
 ## Local

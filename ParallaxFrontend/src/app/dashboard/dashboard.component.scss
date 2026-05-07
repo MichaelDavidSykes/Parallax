@@ -4,6 +4,10 @@
   gap: 14px;
 }
 
+.dashboard-grid--wide {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.54fr);
+}
+
 .run-pulse {
   display: grid;
   grid-template-columns: 1fr 1fr;

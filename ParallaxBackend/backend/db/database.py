@@ -128,6 +128,7 @@ class Database:
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
                     strategy TEXT NOT NULL,
+                    model_id TEXT,
                     initial_cash REAL NOT NULL,
                     final_equity REAL NOT NULL,
                     return_pct REAL NOT NULL,
@@ -140,6 +141,7 @@ class Database:
                 );
                 """
             )
+            self._ensure_column(conn, "backtest_runs", "model_id", "TEXT")
 
     @staticmethod
     def _loads(value: Optional[str], fallback: Any) -> Any:
@@ -173,6 +175,11 @@ class Database:
         item["equity_curve"] = Database._loads(item.pop("equity_curve_json", "[]"), [])
         item["trades"] = Database._loads(item.pop("trades_json", "[]"), [])
         return item
+
+    def _ensure_column(self, conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+        rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+        if column not in {row["name"] for row in rows}:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
     def upsert_markets(self, markets: Iterable[Dict[str, Any]]) -> int:
         count = 0
@@ -484,15 +491,16 @@ class Database:
             conn.execute(
                 """
                 INSERT INTO backtest_runs (
-                    id, name, strategy, initial_cash, final_equity, return_pct,
+                    id, name, strategy, model_id, initial_cash, final_equity, return_pct,
                     started_at, completed_at, parameters_json, metrics_json,
                     equity_curve_json, trades_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     run["id"],
                     run["name"],
                     run["strategy"],
+                    run.get("model_id"),
                     run["initial_cash"],
                     run["final_equity"],
                     run["return_pct"],
@@ -513,4 +521,3 @@ class Database:
                 (limit,),
             ).fetchall()
         return [self.row_to_backtest(row) for row in rows]
-

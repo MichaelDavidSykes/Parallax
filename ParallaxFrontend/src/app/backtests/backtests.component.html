@@ -5,6 +5,23 @@
     </div>
   </div>
 
+  <section class="panel" *ngIf="models.length">
+    <div class="panel-header">
+      <h2 class="panel-title">Models</h2>
+    </div>
+    <div class="model-grid">
+      <button
+        type="button"
+        class="model-tile"
+        *ngFor="let model of models"
+        [class.active]="form.model_id === model.id"
+        (click)="selectModel(model)">
+        <span class="model-tile__name">{{ model.name }}</span>
+        <span class="pill">{{ model.runtime }}</span>
+      </button>
+    </div>
+  </section>
+
   <section class="panel">
     <div class="panel-header">
       <h2 class="panel-title">Run Configuration</h2>
@@ -15,6 +32,14 @@
     </div>
     <div class="panel-body">
       <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Model</mat-label>
+          <mat-select [(ngModel)]="form.model_id" (selectionChange)="onModelChange($event.value)">
+            <mat-option *ngFor="let model of models" [value]="model.id">
+              {{ model.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
           <input matInput [(ngModel)]="form.name">
@@ -40,16 +65,22 @@
           <input matInput type="number" [(ngModel)]="form.fee_bps">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Strategy</mat-label>
-          <mat-select [(ngModel)]="form.strategy">
-            <mat-option value="stat_arb_v1">stat_arb_v1</mat-option>
+          <mat-label>Slippage bps</mat-label>
+          <input matInput type="number" [(ngModel)]="form.slippage_bps">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Mark basis</mat-label>
+          <mat-select [(ngModel)]="form.valuation_basis">
+            <mat-option value="fair">Fair</mat-option>
+            <mat-option value="market">Market</mat-option>
+            <mat-option value="hybrid">Hybrid</mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Refresh</mat-label>
+          <mat-label>Sync</mat-label>
           <mat-select [(ngModel)]="form.refresh_markets">
-            <mat-option [value]="true">Yes</mat-option>
-            <mat-option [value]="false">No</mat-option>
+            <mat-option [value]="true">On</mat-option>
+            <mat-option [value]="false">Off</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -73,6 +104,7 @@
           <th>Name</th>
           <th>Return</th>
           <th>Final Equity</th>
+          <th>Model</th>
           <th>Trades</th>
           <th>Avg Edge</th>
           <th>Completed</th>
@@ -83,6 +115,7 @@
           <td><span class="market-title">{{ run.name }}</span><span class="pill">{{ run.strategy }}</span></td>
           <td [class.positive]="run.return_pct >= 0" [class.negative]="run.return_pct < 0">{{ run.return_pct | number:'1.2-2' }}%</td>
           <td>${{ run.final_equity | number:'1.2-2' }}</td>
+          <td>{{ run.model_id || run.strategy }}</td>
           <td>{{ metric(run, 'trade_count') | number:'1.0-0' }}</td>
           <td>{{ metric(run, 'avg_abs_edge') | percent:'1.1-1' }}</td>
           <td>{{ run.completed_at | date:'short' }}</td>
