@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     DRAFT_API_URL: str = os.getenv("DRAFT_API_URL", "")
     DRAFT_API_TOKEN: str = os.getenv("DRAFT_API_TOKEN", "")
 
+    BINANCE_API_URL: str = os.getenv("BINANCE_API_URL", "https://api.binance.com")
+    BINANCE_SYMBOLS: str = os.getenv("BINANCE_SYMBOLS", "BTCUSDT,ETHUSDT,SOLUSDT")
+
+    TRADING212_ENV: str = os.getenv("TRADING212_ENV", "demo")
+    TRADING212_API_URL: str = os.getenv("TRADING212_API_URL", "")
+    TRADING212_API_KEY: str = os.getenv("TRADING212_API_KEY", "")
+    TRADING212_API_SECRET: str = os.getenv("TRADING212_API_SECRET", "")
+
     ENABLE_HEURISTIC_STATS: bool = os.getenv(
         "PARALLAX_ENABLE_HEURISTIC_STATS", "true"
     ).strip().lower() in {"1", "true", "yes", "on"}
@@ -56,6 +64,18 @@ class Settings(BaseSettings):
     )
 
     model_config = SettingsConfigDict(case_sensitive=True, extra="ignore")
+
+    @property
+    def trading212_base_url(self) -> str:
+        if self.TRADING212_API_URL:
+            return self.TRADING212_API_URL.rstrip("/")
+        if self.TRADING212_ENV.strip().lower() == "live":
+            return "https://live.trading212.com/api/v0"
+        return "https://demo.trading212.com/api/v0"
+
+    @property
+    def binance_symbols(self) -> List[str]:
+        return _parse_origins(self.BINANCE_SYMBOLS)
 
 
 settings = Settings()

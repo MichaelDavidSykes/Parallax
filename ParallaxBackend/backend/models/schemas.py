@@ -153,3 +153,15 @@ class IntegrationStatus(BaseModel):
     status: str
     endpoint: Optional[str] = ""
 
+
+class BinanceTickerOut(BaseModel):
+    symbol: str
+    price: float
+    source: str = "binance-spot"
+
+
+class Trading212AccountOut(BaseModel):
+    info: Dict[str, Any] = {}
+    cash: Dict[str, Any] = {}
+    positions: List[Dict[str, Any]] = []
+    source: str = "trading212"

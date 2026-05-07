@@ -43,3 +43,7 @@ https://parallax-api.46.62.157.149.nip.io
 ```
 
 This hostname resolves to the Hetzner server and is terminated by Caddy in `ParallaxBackend/docker-compose.hetzner.yml`.
+
+## Cloudflare Access
+
+`lunarchain.net` uses Cloudflare nameservers, but `parallax.lunarchain.net` and `api.parallax.lunarchain.net` still need DNS/custom-hosting setup before Access can protect them. The apply script is in `deploy/cloudflare/apply-zero-trust.py`.

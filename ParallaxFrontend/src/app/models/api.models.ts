@@ -87,9 +87,21 @@ export interface IntegrationStatus {
   endpoint?: string;
 }
 
+export interface BinanceTicker {
+  symbol: string;
+  price: number;
+  source: string;
+}
+
+export interface Trading212Account {
+  info: Record<string, unknown>;
+  cash: Record<string, number>;
+  positions: Array<Record<string, unknown>>;
+  source: string;
+}
+
 export interface HealthResponse {
   status: string;
   service: string;
   db_path: string;
 }
-

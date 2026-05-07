@@ -6,3 +6,21 @@
   font-weight: 700;
 }
 
+.integration-cash {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.integration-cash strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+@media (max-width: 680px) {
+  .integration-cash {
+    grid-template-columns: 1fr;
+  }
+}

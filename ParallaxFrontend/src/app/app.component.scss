@@ -96,56 +96,6 @@ $sidebar-width: 220px;
   line-height: 1.1;
 }
 
-.strategy-context {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  width: clamp(210px, 24vw, 288px);
-  min-width: 0;
-  height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--control-border);
-  border-radius: 8px;
-  background: var(--control-bg);
-  color: var(--text-secondary);
-}
-
-.strategy-context__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-}
-
-.strategy-context__label {
-  flex: 0 0 auto;
-  color: var(--text-tertiary);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.strategy-context__divider {
-  width: 1px;
-  height: 18px;
-  flex: 0 0 auto;
-  background: var(--border-subtle);
-}
-
-.strategy-context__value {
-  overflow: hidden;
-  color: var(--text-primary);
-  font-size: 0.86rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .platform-actions {
   display: flex;
   align-items: center;
@@ -292,37 +242,6 @@ $sidebar-width: 220px;
 
 .sidebar-search input::placeholder {
   color: var(--text-tertiary);
-}
-
-.sidebar-status {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 38px;
-  padding: 0 12px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--panel-soft);
-  color: var(--text-secondary);
-}
-
-.sidebar-status__label {
-  display: block;
-  color: var(--text-tertiary);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-
-.sidebar-status strong {
-  display: block;
-  margin-top: 2px;
-  color: var(--text-primary);
-  font-size: 0.82rem;
-  font-weight: 650;
-  line-height: 1.1;
 }
 
 .menu {
@@ -512,12 +431,6 @@ $sidebar-width: 220px;
 .sidebar-footer-link i {
   color: var(--text-tertiary);
   font-size: 0.78rem;
-}
-
-@media (max-width: 1040px) {
-  .strategy-context {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {

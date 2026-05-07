@@ -23,6 +23,12 @@ services:
       - PARALLAX_DB_PATH=/app/data/parallax.db
       - PARALLAX_CORS_ORIGINS=https://parallax-lunarchain.web.app,https://parallax.lunarchain.net,http://localhost:4200,http://localhost:4201,http://localhost:4202
       - PARALLAX_ENABLE_HEURISTIC_STATS=true
+      - BINANCE_API_URL=${BINANCE_API_URL:-https://api.binance.com}
+      - BINANCE_SYMBOLS=${BINANCE_SYMBOLS:-BTCUSDT,ETHUSDT,SOLUSDT}
+      - TRADING212_ENV=${TRADING212_ENV:-demo}
+      - TRADING212_API_URL=${TRADING212_API_URL:-}
+      - TRADING212_API_KEY=${TRADING212_API_KEY:-}
+      - TRADING212_API_SECRET=${TRADING212_API_SECRET:-}
 
   caddy:
     image: caddy:2-alpine
@@ -40,4 +46,3 @@ services:
 volumes:
   parallax_caddy_data:
   parallax_caddy_config:
-

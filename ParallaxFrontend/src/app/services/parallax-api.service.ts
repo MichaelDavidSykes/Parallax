@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { BacktestRun, HealthResponse, IntegrationStatus, Market, Opportunity, Portfolio, Trade } from '../models/api.models';
+import { BacktestRun, BinanceTicker, HealthResponse, IntegrationStatus, Market, Opportunity, Portfolio, Trade, Trading212Account } from '../models/api.models';
 
 @Injectable({
   providedIn: 'root'
@@ -100,5 +100,14 @@ export class ParallaxApiService {
   integrations(): Observable<IntegrationStatus[]> {
     return this.http.get<IntegrationStatus[]>(`${this.baseUrl}/integrations`);
   }
-}
 
+  binancePrices(symbols = ''): Observable<BinanceTicker[]> {
+    return this.http.get<BinanceTicker[]>(`${this.baseUrl}/integrations/binance/prices`, {
+      params: symbols ? { symbols } : {}
+    });
+  }
+
+  trading212Account(): Observable<Trading212Account> {
+    return this.http.get<Trading212Account>(`${this.baseUrl}/integrations/trading212/account`);
+  }
+}
